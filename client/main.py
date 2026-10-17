@@ -15,14 +15,19 @@ PLAYER_RADIUS = 14
 PLAYER_HP = 5
 
 # Bullets
-BULLET_SPEED = 700
+BULLET_SPEED = 800
 BULLET_RADIUS = 4
-FIRE_COOLDOWN = 0.25
+FIRE_COOLDOWN = 0.10
 
 # Enemies and waves
-ENEMY_RADIUS = 20
+ENEMY_RADIUS = 13
 SPAWN_INTERVAL = 0.6
 WAVE_PAUSE = 3.0
+
+TANK_HP = 3
+TANK_RADIUS = 20
+TANK_SPEED_FACTOR = 0.6
+TANK_POINTS = 30
 
 def load_highscore():
     try:
@@ -110,9 +115,13 @@ class Bullet:
 
 
 class Enemy:
-    def __init__(self, pos, speed):
+    def __init__(self, pos, speed, hp=1, radius=ENEMY_RADIUS, color=(235, 80, 80), points=10):
         self.pos = pygame.Vector2(pos)
         self.speed = speed
+        self.hp = hp
+        self.radius = radius
+        self.color = color
+        self.points = points
 
     def update(self, dt, target):
         direction = target - self.pos
@@ -120,7 +129,8 @@ class Enemy:
             self.pos += direction.normalize() * self.speed * dt
 
     def draw(self, screen):
-        pygame.draw.circle(screen, (235, 80, 80), self.pos, ENEMY_RADIUS)
+        pygame.draw.circle(screen, self.color, self.pos, self.radius)
+
 
 class Game:
     def __init__(self):
@@ -154,7 +164,7 @@ class Game:
 
     def start_wave(self):
         self.wave += 1
-        self.to_spawn = 4 + 3 * self.wave
+        self.to_spawn = 5 + 5 * self.wave
         self.enemy_speed = min(70 + 12 * self.wave, 220)
         self.spawn_timer = 0.0
 
@@ -163,6 +173,14 @@ class Game:
             self.highscore = self.score
             save_highscore(self.highscore)
         self.state = "game_over"
+
+    def spawn_enemy(self):
+        pos = random_edge_position()
+        tank_chance = min(0.1 * (self.wave - 1), 0.6)
+        if random.random() < tank_chance:
+            return Enemy(pos, self.enemy_speed * TANK_SPEED_FACTOR, hp=TANK_HP,
+                         radius=TANK_RADIUS, color=(190, 60, 200), points=TANK_POINTS)
+        return Enemy(pos, self.enemy_speed)
 
     def update_playing(self, dt):
         keys = pygame.key.get_pressed()
@@ -182,7 +200,7 @@ class Game:
         if self.to_spawn > 0:
             self.spawn_timer -= dt
             if self.spawn_timer <= 0:
-                self.enemies.append(Enemy(random_edge_position(), self.enemy_speed))
+                self.enemies.append(self.spawn_enemy())
                 self.to_spawn -= 1
                 self.spawn_timer = SPAWN_INTERVAL
 
@@ -192,15 +210,17 @@ class Game:
         # Bullets hitting enemies
         for bullet in self.bullets[:]:
             for enemy in self.enemies[:]:
-                if collides(bullet.pos, BULLET_RADIUS, enemy.pos, ENEMY_RADIUS):
+                if collides(bullet.pos, BULLET_RADIUS, enemy.pos, enemy.radius):
                     self.bullets.remove(bullet)
-                    self.enemies.remove(enemy)
-                    self.score += 10
+                    enemy.hp -= 1
+                    if enemy.hp <= 0:
+                        self.enemies.remove(enemy)
+                        self.score += enemy.points
                     break
 
         # Enemies touching the player
         for enemy in self.enemies[:]:
-            if collides(enemy.pos, ENEMY_RADIUS, self.player.pos, PLAYER_RADIUS):
+            if collides(enemy.pos, enemy.radius, self.player.pos, PLAYER_RADIUS):
                 self.enemies.remove(enemy)
                 self.player.hit()
 
