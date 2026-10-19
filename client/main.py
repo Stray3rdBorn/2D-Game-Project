@@ -29,6 +29,8 @@ TANK_RADIUS = 20
 TANK_SPEED_FACTOR = 0.6 # tanks move at 60% of normal enemy speed
 TANK_POINTS = 30
 
+TOTAL_WAVES = 10
+
 def load_highscore():
     try:
         return json.loads(HIGHSCORE_FILE.read_text())["highscore"]
@@ -174,6 +176,12 @@ class Game:
             save_highscore(self.highscore)
         self.state = "game_over"
 
+    def win_game(self):
+        if self.score > self.highscore:
+            self.highscore = self.score
+            save_highscore(self.highscore)
+        self.state = "victory"
+
     def spawn_enemy(self):
         pos = random_edge_position()
         tank_chance = min(0.1 * (self.wave - 1), 0.6)
@@ -230,6 +238,9 @@ class Game:
                 self.between_waves = True
                 self.wave_timer = WAVE_PAUSE
                 self.score += 50 * self.wave
+                if self.wave >= TOTAL_WAVES and self.player.hp > 0:
+                    self.win_game()
+                    return
             self.wave_timer -= dt
             if self.wave_timer <= 0:
                 self.between_waves = False
@@ -270,12 +281,21 @@ class Game:
         self.draw_text(f"High score: {self.highscore}", self.font, (190, 190, 200), (WIDTH / 2, 345))
         self.draw_text("Press SPACE to play again", self.font, (255, 230, 90), (WIDTH / 2, 420))
 
+    def draw_victory(self):
+        self.draw_text("YOU WIN", self.big_font, (110, 230, 130), (WIDTH / 2, 200))
+        self.draw_text(f"Score: {self.score}   HP left: {self.player.hp}",
+                       self.font, (255, 255, 255), (WIDTH / 2, 300))
+        self.draw_text(f"High score: {self.highscore}", self.font, (190, 190, 200), (WIDTH / 2, 345))
+        self.draw_text("Press SPACE to play again", self.font, (255, 230, 90), (WIDTH / 2, 420))
+
     def draw(self):
         self.screen.fill((20, 20, 28))
         if self.state == "menu":
             self.draw_menu()
         elif self.state == "playing":
             self.draw_playing()
+        elif self.state == "victory":
+            self.draw_victory()
         else:
             self.draw_game_over()
         pygame.display.flip()
@@ -290,7 +310,7 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
-                    elif event.key == pygame.K_SPACE and self.state in ("menu", "game_over"):
+                    elif event.key == pygame.K_SPACE and self.state in ("menu", "game_over", "victory"):
                         self.start_game()
 
             if self.state == "playing":

@@ -1,8 +1,21 @@
-# Python virtual environment
-venv/
-
-# Python compiled cache folders
+# Python
 __pycache__/
+*.pyc
+venv/
+.venv/
 
-# Local game saves / user data (keeps scores private to your machine)
+# Test and tool caches
+.pytest_cache/
+.flake8_cache/
+
+# Game save data 
 highscore.json
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+
+.env
