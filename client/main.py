@@ -31,19 +31,19 @@ TANK_POINTS = 30
 
 TOTAL_WAVES = 10
 
-def load_highscore():
+def load_highscore():    # returns the highscore from the file, or 0 if the file doesn't exist or is invalid
     try:
         return json.loads(HIGHSCORE_FILE.read_text())["highscore"]
     except (FileNotFoundError, KeyError, ValueError):
         return 0
 
 
-def save_highscore(score):
+def save_highscore(score):  #saves the highscore to the file
     HIGHSCORE_FILE.write_text(json.dumps({"highscore": score}))
 
 
-def collides(pos_a, radius_a, pos_b, radius_b):
-    return pos_a.distance_to(pos_b) < radius_a + radius_b  # True if the two circles overlap means a hit
+def collides(pos_a, radius_a, pos_b, radius_b):     
+    return pos_a.distance_to(pos_b) < radius_a + radius_b  # True if the two circles overlap, means a hit
 
 
 def random_edge_position():     # returns a random position just outside the window on one of the four edges so enemies can spawn offscreen
