@@ -1,6 +1,6 @@
 # Arena Survival
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![CI](https://github.com/Stray3rdBorn/2D-Game-Project/actions/workflows/ci.yml/badge.svg)](https://github.com/Stray3rdBorn/2D-Game-Project/actions/workflows/ci.yml)
 
 A 2D top down arena shooter built with Python and Pygame. Survive 10 waves of enemies that chase you across a single screen. Shoot them down, clear every wave to win, and beat your high score.
 
