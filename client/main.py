@@ -58,14 +58,14 @@ def random_edge_position():     # returns a random position just outside the win
 
 
 class Player:
-    def __init__(self):
+    def __init__(self):  #Creates a new player and puts it in the starting state
         self.reset()
 
-    def reset(self):
-        self.pos = pygame.Vector2(WIDTH / 2, HEIGHT / 2)
+    def reset(self):    #Resets position, health, cooldown and invulnerability
+        self.pos = pygame.Vector2(WIDTH / 2, HEIGHT / 2)    #start in the center
         self.hp = PLAYER_HP
-        self.cooldown = 0.0
-        self.invulnerable = 0.0
+        self.cooldown = 0.0     #time until player can shoot again
+        self.invulnerable = 0.0 #time player is immune after being hit
 
     def update(self, dt, keys):
         dx = (keys[pygame.K_d] or keys[pygame.K_RIGHT]) - (keys[pygame.K_a] or keys[pygame.K_LEFT])
