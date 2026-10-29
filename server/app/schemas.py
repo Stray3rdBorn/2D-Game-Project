@@ -4,7 +4,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ScoreCreate(BaseModel):
-    player_name: str = Field(min_length=1, max_length=20)
     score: int = Field(ge=0, le=100_000)
     wave_reached: int = Field(ge=1, le=10)
     won: bool = False

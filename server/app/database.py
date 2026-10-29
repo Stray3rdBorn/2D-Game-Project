@@ -16,6 +16,8 @@ SessionLocal = sessionmaker(bind=engine)
 
 class Base(DeclarativeBase):
     pass
+class DjangoBase(DeclarativeBase):
+    pass
 
 
 def get_db():
