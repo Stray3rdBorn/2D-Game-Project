@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import ApiKey, Score
+
+admin.site.register(ApiKey)
+admin.site.register(Score)
