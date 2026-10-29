@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
-from accounts import views
+from server.web.accounts import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
